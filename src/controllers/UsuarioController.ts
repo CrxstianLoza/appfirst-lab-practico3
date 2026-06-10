@@ -3,24 +3,6 @@ import Database from "../config/database";
 import Usuario from "../models/Usuario";
 
 class UsuarioController {
-//   public async crear(req: Request, res: Response) {
-//     try {
-//       const { nombre, email } = req.body;
-
-//       const usuario = new Usuario(nombre, email);
-//       const db = Database.getInstance().getConnection();
-
-//       await db.query(
-//         "INSERT INTO usuarios(nombre, email) VALUES (?, ?)",
-//         [usuario.getNombre(), usuario.getEmail()]
-//       );
-
-//       res.json({ mensaje: "Usuario creado" });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ mensaje: "Error al crear usuario", error });
-//     }
-//   }
 
   public async listar(req: Request, res: Response) {
     try {
@@ -70,56 +52,30 @@ class UsuarioController {
   }
 }
 
-  public async crear(
-      req: Request,
-      res: Response
-  ): Promise<void> {
+public async crear(req: Request, res: Response): Promise<void> {
+  try {
+    const { nombre, email } = req.body;
 
-      try {
-          const { nombre, precio } = req.body;
+    const usuario = new Usuario(nombre, email);
+    const db = Database.getInstance().getConnection();
 
-          const db = Database.getInstance().getConnection();
+    await db.query(
+      "INSERT INTO usuarios(nombre, email) VALUES (?, ?)",
+      [usuario.getNombre(), usuario.getEmail()]
+    );
 
-          const rutaImagen = req.file
-              ? `/src/uploads/perfiles${req.file.filename}`
-              : null;
+    res.status(201).json({ 
+      mensaje: "Usuario creado" 
+    });
 
-          await db.query(
-              `
-              INSERT INTO usuarios
-              (
-                  nombre,
-                  precio,
-                  imagen
-              )
-              VALUES
-              (
-                  ?,
-                  ?,
-                  ?
-              )
-              `,
-              [
-                  nombre,
-                  precio,
-                  rutaImagen
-              ]
-          );
-
-          res.status(201).json({
-              mensaje: "Producto creado",
-              imagen: rutaImagen
-          });
-
-      } catch (error) {
-
-          res.status(500).json({
-              mensaje: "Error interno",
-              error
-          });
-
-      }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ 
+      mensaje: "Error al crear usuario", 
+      error 
+    });
   }
+}
 }
 
 export default new UsuarioController();

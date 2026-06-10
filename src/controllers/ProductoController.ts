@@ -77,7 +77,55 @@ class ProductoController {
 
         }
     }
+public async actualizar(
+    req: Request,
+    res: Response
+): Promise<void> {
 
+    try {
+        const { idProducto } = req.params;
+        const { nombre, precio } = req.body;
+
+        const db = Database.getInstance().getConnection();
+
+        const rutaImagen = req.file
+            ? `/src/productos/${req.file.filename}`
+            : null;
+
+        if (rutaImagen) {
+            await db.query(
+                `
+                UPDATE productos
+                SET nombre = ?, precio = ?, imagen = ?
+                WHERE idProducto = ?
+                `,
+                [nombre, precio, rutaImagen, idProducto]
+            );
+        } else {
+            await db.query(
+                `
+                UPDATE productos
+                SET nombre = ?, precio = ?
+                WHERE idProducto = ?
+                `,
+                [nombre, precio, idProducto]
+            );
+        }
+
+        res.json({
+            mensaje: "Producto actualizado",
+            imagen: rutaImagen
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            mensaje: "Error interno",
+            error
+        });
+
+    }
+}
     public async eliminar(
         req: Request,
         res: Response
